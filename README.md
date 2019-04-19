@@ -56,7 +56,7 @@ log4j.appender.oozieKafka.layout.ConversionPattern=%d{ISO8601} %5p %c{1}:%L - SE
 log4j.appender.oozieKafka.RollingPolicy.FileNamePattern=${log4j.appender.oozieKafka.File}-%d{yyyy-MM-dd-HH}
 log4j.appender.oozieKafka.RollingPolicy.MaxHistory=720
 
-log4j.logger.org.monitoring.oozie=INFO, oozieKafka
+log4j.logger.org.apache.oozie.event.listener.monitoring=INFO, oozieKafka
 ```
 
 Restart oozie
