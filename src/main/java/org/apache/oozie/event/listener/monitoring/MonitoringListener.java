@@ -39,9 +39,8 @@ public class MonitoringListener extends JobEventListener {
 				notification.getValue().close();
 				LOGGER.info("Close unused producer");
 			}).build();
-	
-	private Gson mapper = new Gson().newBuilder().setPrettyPrinting()
-			.registerTypeAdapter(Date.class, new DateTypeAdapter()).create();
+
+	private Gson mapper = new Gson().newBuilder().registerTypeAdapter(Date.class, new DateTypeAdapter()).create();
 
 	private String kafkaBootstrapServers;
 	private String kafkaTopic;
@@ -53,6 +52,7 @@ public class MonitoringListener extends JobEventListener {
 		}
 		KafkaProducer<String, String> kafkaProducer = cache.getIfPresent(SINGLE_PRODUCER);
 		if (kafkaProducer == null) {
+			LOGGER.info("Create new producer");
 			Properties properties = new Properties();
 			properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServers);
 			properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -60,6 +60,7 @@ public class MonitoringListener extends JobEventListener {
 			properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 1000);
 			kafkaProducer = new KafkaProducer<>(properties);
 			cache.put(SINGLE_PRODUCER, kafkaProducer);
+			LOGGER.info("Producer created");
 		}
 		return kafkaProducer;
 	}
@@ -112,9 +113,8 @@ public class MonitoringListener extends JobEventListener {
 	}
 
 	private synchronized void sendEventToKafka(String event) {
-		KafkaProducer<String, String> producer = null;
 		try {
-			producer = getProducer();
+			KafkaProducer<String, String> producer = getProducer();
 			if (producer != null) {
 				Future<RecordMetadata> futureSend = producer
 						.send(new ProducerRecord<String, String>(kafkaTopic, event));
